@@ -1,0 +1,27 @@
+# Build output
+mcp-servers/session-sync/dist/
+mcp-servers/session-sync/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+orchestrator/__pycache__/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Plan mode artifacts
+.planning/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

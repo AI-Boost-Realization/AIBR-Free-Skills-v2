@@ -117,8 +117,10 @@ if [[ -d "$SKILLS_DIR" ]]; then
   echo ""
 
   # Find all .md files in skills/ subdirectories, flatten into commands/
+  # Skip README.md files — those are category docs, not skills
   while IFS= read -r -d '' skill_file; do
     filename="$(basename "$skill_file")"
+    [[ "$filename" == "README.md" ]] && continue
     dest="$COMMANDS_DIR/$filename"
     symlink_file "$skill_file" "$dest" "skill"
   done < <(find "$SKILLS_DIR" -name "*.md" -print0 | sort -z)
@@ -137,6 +139,7 @@ if [[ -d "$AGENTS_SRC_DIR" ]]; then
 
   while IFS= read -r -d '' agent_file; do
     filename="$(basename "$agent_file")"
+    [[ "$filename" == "README.md" ]] && continue
     dest="$AGENTS_DIR/$filename"
     symlink_file "$agent_file" "$dest" "agent"
   done < <(find "$AGENTS_SRC_DIR" -name "*.md" -print0 | sort -z)
@@ -144,6 +147,39 @@ if [[ -d "$AGENTS_SRC_DIR" ]]; then
   echo ""
 else
   echo -e "${YELLOW}WARNING: agents/ directory not found at $AGENTS_SRC_DIR${RESET}"
+fi
+
+# ─── MCP Server: Build Instructions ──────────────────────────────────────────
+MCP_DIR="$REPO_DIR/mcp-servers/session-sync"
+
+if [[ -d "$MCP_DIR" ]]; then
+  echo -e "${BOLD}MCP Server — Session Sync${RESET}"
+  echo ""
+  echo -e "To install the session-sync MCP server:"
+  echo -e "  ${CYAN}cd $MCP_DIR && npm install && npm run build${RESET}"
+  echo ""
+  echo -e "Then add to ${CYAN}~/.claude/settings.json${RESET} under ${CYAN}\"mcpServers\"${RESET}:"
+  echo ""
+  cat << MCPJSON
+    "session-sync": {
+      "command": "node",
+      "args": ["$MCP_DIR/dist/index.js"]
+    }
+MCPJSON
+  echo ""
+fi
+
+# ─── Python Orchestrator: Install Instructions ────────────────────────────────
+ORCH_DIR="$REPO_DIR/orchestrator"
+
+if [[ -d "$ORCH_DIR" ]]; then
+  echo -e "${BOLD}Python Orchestrator${RESET}"
+  echo ""
+  echo -e "Requirements: Python 3.11+, watchdog, anthropic"
+  echo -e "  ${CYAN}pip install watchdog anthropic${RESET}"
+  echo -e "Run in background:"
+  echo -e "  ${CYAN}nohup python $ORCH_DIR/master-orchestrator.py &${RESET}"
+  echo ""
 fi
 
 # ─── Hooks: Manual Wiring Instructions ───────────────────────────────────────
