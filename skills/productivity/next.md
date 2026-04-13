@@ -15,8 +15,6 @@ allowed-tools:
 
 <objective>
 Push work forward. `/next` reads every available context source — session state, plans, git status, codebase — builds a complete picture of where things stand, and then recommends and executes the most impactful next action.
-
-Where `/go` starts sessions, `/next` drives them.
 </objective>
 
 <process>
@@ -31,7 +29,7 @@ git status 2>/dev/null
 ```
 
 2. Read session state:
-   - `~/.claude/.current-work-session.json` — PRIMARY source. `next_action` and `completed_this_session` are authoritative.
+   - Check for a current work session file or saved plan — `next_action` and `completed_this_session` are authoritative.
 
 3. Read plan files if any exist:
 ```bash
@@ -63,8 +61,6 @@ The goal: every item presented should be current and verified against real state
 
 <step name="check_sdlc_state">
 **Detect where we are in the development lifecycle:**
-
-Use git status and recent actions to determine SDLC phase:
 
 | Signal | SDLC Phase | What to Suggest |
 |--------|------------|-----------------|
@@ -145,7 +141,7 @@ The action depends on the SDLC phase detected:
 
 **If testing:** Run the test suite or perform manual verification.
 ```bash
-cd {project_dir} && npm test  # or pytest, cargo test, etc.
+npm test  # or pytest, cargo test, etc.
 ```
 
 **If committing:** Stage relevant files and prepare a commit message.
@@ -156,16 +152,7 @@ cd {project_dir} && npm test  # or pytest, cargo test, etc.
 
 **If blocked:** Skip to the next independent task from the plan.
 
-**If all done:** Suggest next steps — check for uncommitted work, look for other active work items, surface upcoming deadlines.
-</step>
-
-<step name="update_state">
-**After executing, update session state:**
-
-Update `~/.claude/.current-work-session.json` with:
-- New `last_position` (file just worked on)
-- New `next_action` (what comes after what was just done)
-- Updated `timestamp`
+**If all done:** Suggest next steps — check for uncommitted work, look for other active work items.
 </step>
 
 </process>
@@ -190,7 +177,6 @@ Update `~/.claude/.current-work-session.json` with:
 
 ## SDLC Best Practices Enforcement
 
-The skill naturally guides through the development lifecycle:
 - Never suggest deploying without testing
 - Never suggest committing without reviewing changes
 - After code changes, always suggest verification

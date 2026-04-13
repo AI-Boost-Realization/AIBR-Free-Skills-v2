@@ -1,0 +1,19 @@
+{
+  "name": "session-sync",
+  "version": "1.0.0",
+  "description": "MCP server for Claude Code multi-session awareness and coordination",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

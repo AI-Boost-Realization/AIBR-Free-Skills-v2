@@ -2,9 +2,9 @@
 
 **An open-source AI engineering platform for Claude Code — built from 12 months of production use.**
 
-30 skills · 12 specialist agents · 10 lifecycle hooks · 7 architectural patterns
+60 skills · 12 specialist agents · 18 lifecycle hooks · 7 architectural patterns · 1 MCP server · 1 Python orchestrator
 
-[Install in 30 seconds](#installation) · [Browse Skills](#skills) · [Agent Hierarchy](#agents) · [Hook System](#hooks)
+[Install in 30 seconds](#installation) · [Browse Skills](#skills) · [Agent Hierarchy](#agents) · [Hook System](#hooks) · [GSD Framework](#gsd-framework) · [MCP Servers](#mcp-servers) · [Orchestrator](#python-orchestrator)
 
 ---
 
@@ -28,14 +28,14 @@ Everything here was extracted from real production work — debugging voice agen
                                           │
                         ┌─────────────────▼───────────────┐
                         │             Skills               │
-                        │  /commands — 30 skill files      │
+                        │  /commands — 60 skill files      │
                         │  Orchestrate work, set context,  │
                         │  dispatch to specialist agents   │
                         └──────┬──────────────────┬───────┘
                                │                  │
                ┌───────────────▼──┐  ┌────────────▼──────────────┐
                │     Agents       │  │          Hooks             │
-               │  12 specialist   │  │   10 lifecycle scripts     │
+               │  12 specialist   │  │   18 lifecycle scripts     │
                │  roles, each     │  │   PreToolUse, PostToolUse  │
                │  scoped to a     │  │   Stop, SessionStart       │
                │  tool allowlist  │  │   Self-healing runtime     │
@@ -55,12 +55,15 @@ Everything here was extracted from real production work — debugging voice agen
   Code Quality  (2)             arch decisions   Stop
   Planning      (2)     ─────────────────────   SessionStart
   Productivity  (4)     Sonnet → code changes,
-  Multi-Agent   (3)             implementation,
-  Knowledge     (4)             API work
-  Research      (2)     ─────────────────────
-  Video         (2)     Haiku  → search,
-  Deployment    (3)             diagnostics,
-  Social        (2)             lightweight reads
+  Multi-Agent   (3)             implementation,  Additional layers:
+  Knowledge     (4)             API work         ─────────────────
+  Research      (2)     ─────────────────────   MCP Servers  (1)
+  Video         (2)     Haiku  → search,        Python Daemon(1)
+  Deployment    (3)             diagnostics,     Configs      (10)
+  Social        (2)             lightweight reads Plugins     (1)
+  GSD          (22)
+  Vault/KM      (4)
+  Career        (2)
 ```
 
 The flow is intentional: skills are the interface, agents are the workers, hooks are the safety net, patterns are the documentation. Each layer has a single responsibility. No agent modifies `.env` files. No hook blocks valid work. Every skill declares its scope upfront.
@@ -70,7 +73,7 @@ The flow is intentional: skills are the interface, agents are the workers, hooks
 ## Installation
 
 ```bash
-git clone https://github.com/[your-github-username]/aibr-free-skills.git
+git clone https://github.com/ryanhalphide/aibr-free-skills.git
 cd aibr-free-skills
 chmod +x install.sh && ./install.sh
 ```
@@ -176,6 +179,90 @@ Skills are invoked as `/skill-name` slash commands in Claude Code. Each skill fi
 | `/social-draft` | Drafts platform-specific social content (LinkedIn, X, Instagram) from a brief |
 | `/social-campaign` | Builds a multi-post campaign with scheduling, variant copy, and cross-platform adaptation |
 
+### GSD Framework (22 commands)
+
+A complete AI project management system. Manages multi-phase projects with milestones, assumption tracking, progress reporting, and automated work sequencing. Built from managing 6+ concurrent production projects.
+
+| Skill | Description |
+|---|---|
+| `/new-project` | Scaffold a new project with phases, milestones, and success criteria |
+| `/new-milestone` | Add a milestone with acceptance criteria and dependencies |
+| `/create-roadmap` | Generate a visual project roadmap from current state |
+| `/plan-phase` | Deep-plan a single phase with tasks, estimates, and risk flags |
+| `/execute-plan` | Begin executing the current phase plan, tracking progress per-task |
+| `/add-phase` / `/insert-phase` / `/remove-phase` | Modify the phase structure without losing progress |
+| `/research-phase` | Research-only pass on a phase before committing to implementation |
+| `/discuss-phase` / `/discuss-milestone` | Structured discussion with tradeoff analysis before decisions |
+| `/consider-issues` | Surface blockers, risks, and open questions across all active phases |
+| `/list-phase-assumptions` | Enumerate and rank unverified assumptions for the current phase |
+| `/progress` | Current status across all phases and milestones with completion % |
+| `/complete-milestone` | Mark a milestone done with evidence and update downstream dependencies |
+| `/verify-work` | Run verification checks against milestone acceptance criteria |
+| `/plan-fix` | Diagnose and plan a fix for a failing milestone or phase |
+| `/map-codebase` | Generate an architectural map of the project codebase |
+| `/pause-work` / `/resume-work` / `/resume-task` | Session lifecycle — save state, resume later, pick up a specific task |
+| `/help` | GSD command reference and usage guide |
+
+### Knowledge Management
+
+A 4-skill vault system for building persistent, AI-assisted knowledge bases using the PARA method. Works with Obsidian or any markdown-based note system.
+
+| Skill | Description |
+|---|---|
+| `/vault-capture` | Capture a new knowledge entry with auto-classification (Project/Area/Resource/Archive) |
+| `/vault-sync` | Reconcile vault state — find orphans, fix broken links, update indexes |
+| `/vault-review` | Audit vault health — stale entries, missing context, coverage gaps |
+| `/vault-inbox` | Process the inbox — triage, classify, and route unprocessed captures |
+
+### Career
+
+| Skill | Description |
+|---|---|
+| `/resume-factory` | Generate role-targeted resume variants from a master profile with scoring |
+| `/resume-iterate` | Iterative resume refinement based on job posting analysis and ATS optimization |
+
+---
+
+## GSD Framework
+
+The GSD (Get Shit Done) framework is a 22-command project management system designed specifically for AI-assisted development. It solves the fundamental problem of Claude Code sessions: excellent at executing individual tasks, but no built-in scaffolding for tracking state, sequencing work, or maintaining context across sessions.
+
+GSD provides that scaffolding. Projects have phases. Phases have milestones. Milestones have acceptance criteria. Progress is tracked automatically. Assumptions are logged and ranked. When you come back to a project after a week, `/progress` tells you exactly where you left off and `/resume-work` picks up the next task.
+
+All 22 commands live in `skills/gsd/`. See `skills/gsd/README.md` for the full command reference.
+
+---
+
+## MCP Servers
+
+### Session Sync (`mcp-servers/session-sync/`)
+
+A TypeScript MCP server that enables real-time coordination between multiple Claude Code sessions. When you run 3+ terminals on the same project (common during `/hive` or `/sprint` workflows), sessions can broadcast events, detect file conflicts, and coordinate task assignment — all through the MCP protocol.
+
+**12 MCP tools** including session registration, broadcast, event log queries, conflict detection, and stale session cleanup. Auto-registers using `process.ppid`. File-based state in `~/.claude/shared-state/` — no external server required.
+
+Built with the official `@modelcontextprotocol/sdk` and compiles clean with zero TypeScript errors.
+
+See `mcp-servers/session-sync/README.md` for architecture details and installation.
+
+---
+
+## Python Orchestrator
+
+A 7-file async Python daemon (`orchestrator/`) that adds a persistent automation layer on top of Claude Code. Runs in the background monitoring your workspace:
+
+| File | Purpose |
+|---|---|
+| `master-orchestrator.py` | Main daemon — watches directory changes, auto-executes skills, detects behavioral patterns |
+| `model-router.py` | Keyword + context analysis for Opus/Sonnet/Haiku routing with cost logging |
+| `session_manager.py` | Session lifecycle management |
+| `progress-tracker.py` | Plan progress tracking across phases and milestones |
+| `token-tracker.py` | Token usage tracking and budget enforcement |
+| `activity-logger.py` | Structured activity logging for post-session analysis |
+| `gsd-ralph-detector.py` | Detects "Ralph Wiggum loops" — repetitive stuck patterns that waste tokens |
+
+All 7 files pass `py_compile` cleanly. See `orchestrator/README.md` for setup and background process configuration.
+
 ---
 
 ## Agents
@@ -214,7 +301,29 @@ Hooks are shell scripts wired into Claude Code's lifecycle events. They fire aut
 | `PreToolUse` | Before any tool call — can block or warn | Branch protection, secret scanning, disk space checks |
 | `PostToolUse` | After any tool call — can log or trigger side effects | Error diagnosis, test triggering, deploy verification |
 | `Stop` | When Claude finishes a response | Memory extraction, session logging |
-| `SessionStart` | At the start of a new session | Context loading, trust score initialization |
+| `SessionStart` | At the start of a new session | Context loading, trust score initialization, vault sync |
+
+### All 18 Hooks
+
+| Hook | Event | Purpose |
+|---|---|---|
+| `session-awareness.sh` | SessionStart | Detects other active sessions, prevents conflicts |
+| `janitor.sh` | SessionStart | TTL-based workspace cleanup |
+| `inject-git-state.sh` | SessionStart | Auto-injects current git branch, status, recent commits |
+| `vault-sync-auto.sh` | SessionStart | Syncs vault memory files at session start |
+| `memory-reconcile.sh` | SessionStart | Reconciles memory index with actual memory files |
+| `vault-structure-audit.sh` | SessionStart | Validates PARA directory structure |
+| `trust-gate.sh` | PreToolUse | Progressive autonomy gate (see below) |
+| `env-blocker.sh` | PreToolUse | Blocks writes to .env and credential files |
+| `git-safety-check.sh` | PreToolUse | Pre-flight check on destructive git operations |
+| `pre-deploy-check.sh` | PreToolUse | Validates deployment prerequisites before push |
+| `auto-diagnose.sh` | PostToolUse | Self-healing error categorizer (see below) |
+| `context-budget-warn.sh` | PostToolUse | Warns when approaching token/tool-call budget |
+| `post-deploy-healthcheck.sh` | PostToolUse | Auto-probes health endpoints after deploy commands |
+| `post-edit-typecheck.sh` | PostToolUse | Runs TypeScript compiler after file edits |
+| `sync-emit.sh` | PostToolUse | Emits events to session-sync MCP for multi-session coordination |
+| `memory-extract.sh` | Stop | AI-powered session insight extraction (see below) |
+| `completeness-checker.md` | Stop | Validates all tasks are done before session ends |
 
 ### The 3 Most Novel Hooks
 
@@ -248,12 +357,28 @@ Seven architectural patterns are documented in `/patterns/`. Each is a standalon
 
 ---
 
+## Configs
+
+Example configurations in `configs/` that you can adapt:
+
+- **`settings-example.jsonc`** — Fully annotated `settings.json` showing hook wiring, model routing, permissions, and MCP server configuration
+- **Hookify templates** — 5 ready-to-use declarative hook rules (branch protection, secret scanning, disk space guard, retry limits, TypeScript lint)
+- **Coding rules** — 4 rule files for production safety, TypeScript conventions, Python conventions, and workflow preferences
+
+## Plugins
+
+The `plugins/` directory contains example Claude Code plugins:
+
+- **Optimizer** — A workspace audit plugin with two skills: `/optimize` (configuration + coverage gap analysis, scored report) and `/cost-track` (token cost estimation across sessions with reduction recommendations)
+
+---
+
 ## About AIBR
 
 AI Boost Realization builds production AI tooling for developers and teams.
 
 - Website: [aibr.pro](https://aibr.pro)
-- GitHub: [github.com/[your-github-username]](https://github.com/[your-github-username])
+- GitHub: [github.com/ryanhalphide](https://github.com/ryanhalphide)
 - Agent Empire: [agentbuilder.aibr.pro](https://agentbuilder.aibr.pro)
 - Agent Academy: [agents.aibr.pro](https://agents.aibr.pro)
 
