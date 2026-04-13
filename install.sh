@@ -92,7 +92,7 @@ symlink_file() {
 
   if [[ -L "$dest" ]] && ! $FORCE; then
     echo -e "  ${YELLOW}SKIP${RESET}  $(basename "$src") — symlink exists (use --force to overwrite)"
-    if [[ "$label" == "skill" ]]; then ((SKILLS_SKIPPED++)); else ((AGENTS_SKIPPED++)); fi
+    if [[ "$label" == "skill" ]]; then ((SKILLS_SKIPPED++)) || true; else ((AGENTS_SKIPPED++)) || true; fi
     return
   fi
 
@@ -106,7 +106,7 @@ symlink_file() {
     echo -e "  ${GREEN}LINK${RESET}  $(basename "$src")"
   fi
 
-  if [[ "$label" == "skill" ]]; then ((SKILLS_INSTALLED++)); else ((AGENTS_INSTALLED++)); fi
+  if [[ "$label" == "skill" ]]; then ((SKILLS_INSTALLED++)) || true; else ((AGENTS_INSTALLED++)) || true; fi
 }
 
 # ─── Install Skills ───────────────────────────────────────────────────────────
