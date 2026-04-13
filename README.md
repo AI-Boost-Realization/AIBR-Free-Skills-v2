@@ -1,10 +1,16 @@
 # AIBR Agent Framework
 
+[![CI](https://github.com/ryanhalphide/aibr-free-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/ryanhalphide/aibr-free-skills/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-60-green)](skills/)
+[![Agents](https://img.shields.io/badge/agents-12-orange)](agents/)
+[![Hooks](https://img.shields.io/badge/hooks-18-purple)](hooks/)
+
 **An open-source AI engineering platform for Claude Code — built from 12 months of production use.**
 
 60 skills · 12 specialist agents · 18 lifecycle hooks · 7 architectural patterns · 1 MCP server · 1 Python orchestrator
 
-[Install in 30 seconds](#installation) · [Browse Skills](#skills) · [Agent Hierarchy](#agents) · [Hook System](#hooks) · [GSD Framework](#gsd-framework) · [MCP Servers](#mcp-servers) · [Orchestrator](#python-orchestrator)
+[Install in 30 seconds](#installation) · [Browse Skills](#skills) · [Agent Hierarchy](#agents) · [Hook System](#hooks) · [GSD Framework](#gsd-framework) · [MCP Servers](#mcp-servers) · [Orchestrator](#python-orchestrator) · [Contributing](#contributing)
 
 ---
 
@@ -72,6 +78,12 @@ The flow is intentional: skills are the interface, agents are the workers, hooks
 
 ## Installation
 
+**One-liner:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/ryanhalphide/aibr-free-skills/main/bootstrap.sh | bash
+```
+
+**Or clone manually:**
 ```bash
 git clone https://github.com/ryanhalphide/aibr-free-skills.git
 cd aibr-free-skills
@@ -370,6 +382,20 @@ Example configurations in `configs/` that you can adapt:
 The `plugins/` directory contains example Claude Code plugins:
 
 - **Optimizer** — A workspace audit plugin with two skills: `/optimize` (configuration + coverage gap analysis, scored report) and `/cost-track` (token cost estimation across sessions with reduction recommendations)
+
+---
+
+## Examples
+
+See `examples/CLAUDE.md` for a worked reference showing how all the framework pieces wire together in a real TypeScript/Hono project — model routing, hook configuration, agent delegation rules, GSD integration, and memory system setup.
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to add skills, agents, and hooks.
+
+The short version: fork, create a branch, add your skill/agent/hook with correct frontmatter, verify `./install.sh --dry-run` works, submit a PR.
 
 ---
 
